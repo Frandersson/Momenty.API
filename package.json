@@ -1,0 +1,24 @@
+{
+  "name": "momenty.api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Frandersson/Momenty.API.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Frandersson/Momenty.API/issues"
+  },
+  "homepage": "https://github.com/Frandersson/Momenty.API#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.5",
+    "file-system": "^2.2.2"
+  }
+}
