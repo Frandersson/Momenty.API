@@ -37,12 +37,12 @@ function getFundReturnRates() {
             }
         })
     })
-
+    
     fundNames.forEach(function(value, index) {
         fundMap[value] = parseFloat(fundReturnRates[index].replace(",", "."));
     })
 
-    return JSON.stringify(fundMap);
+    return fundMap;
 }
 
 
