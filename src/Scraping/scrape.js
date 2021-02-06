@@ -17,34 +17,36 @@ async function loadFile() {
 }
 */
 
-async function getFundReturnRates() {
-    fs.readFile('./output/funds', 'utf-8', (error, data) => {
-        if (error) throw error;
-        
-        let fundNames = [];
-        let fundReturnRates = [];
-        let fundMap = {};
-        const $ = cheerio.load(data);
-        
-        $('table.fixed-table tbody').first().find('a').each(function() {
-            fundNames.push($(this).text().trim());
-        })
+function getFundReturnRates() {
+    const htmlData = fs.readFileSync('./output/funds', 'utf-8');
 
-        $('table.scrolling-table tbody').first().find('tr').each(function() {
-            $(this).find('td').each(function(i, v) {
-                if (i == 3) {
-                    fundReturnRates.push($(this).text().trim())
-                }
-            })
-        })
-
-        fundNames.forEach(function(value, index) {
-            fundMap[value] = parseFloat(fundReturnRates[index].replace(",", "."));
-        })
-
-        console.log(JSON.stringify(fundMap));
+    let fundNames = [];
+    let fundReturnRates = [];
+    let fundMap = {};
+    
+    const $ = cheerio.load(htmlData);
+    
+    $('table.fixed-table tbody').first().find('a').each(function() {
+        fundNames.push($(this).text().trim());
     })
+
+    $('table.scrolling-table tbody').first().find('tr').each(function() {
+        $(this).find('td').each(function(i, v) {
+            if (i == 3) {
+                fundReturnRates.push($(this).text().trim())
+            }
+        })
+    })
+
+    fundNames.forEach(function(value, index) {
+        fundMap[value] = parseFloat(fundReturnRates[index].replace(",", "."));
+    })
+
+    return JSON.stringify(fundMap);
 }
 
+
+
+
+
 exports.getFundReturnRates = getFundReturnRates;
-//exports.loadFile = loadFile;
