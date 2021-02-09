@@ -1,30 +1,20 @@
+// node_modules
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
+// Models
+const GenericFund = require('./Models/genericFund');
 
-/*
-const requestUrl = "https://www.di.se/fonder/historik/?SortBy=Diff3mPrc&SortOrder=desc"
 
-async function loadFile() {
-    axios.get(requestUrl).then(function(response) {
+async function getFundReturnRates() {
 
-        const data = response.data;
-
-        fs.writeFile('./output/funds', data, function(err) {
-            if (err) throw err;
-        })
-    })
-}
-*/
-
-function getFundReturnRates() {
-    const htmlData = fs.readFileSync('./output/funds', 'utf-8');
+    const htmlData = await axios.get("https://www.di.se/fonder/historik/?SortBy=Diff3mPrc&SortOrder=desc");
 
     let fundNames = [];
     let fundReturnRates = [];
-    let fundMap = {};
+    let fundMap = [];
     
-    const $ = cheerio.load(htmlData);
+    const $ = cheerio.load(htmlData.data);
     
     $('table.fixed-table tbody').first().find('a').each(function() {
         fundNames.push($(this).text().trim());
@@ -39,14 +29,11 @@ function getFundReturnRates() {
     })
     
     fundNames.forEach(function(value, index) {
-        fundMap[value] = parseFloat(fundReturnRates[index].replace(",", "."));
+        let returnRate = parseFloat(fundReturnRates[index].replace(",", "."));
+        fundMap.push(new GenericFund(value, returnRate));
     })
 
     return fundMap;
 }
-
-
-
-
 
 exports.getFundReturnRates = getFundReturnRates;
