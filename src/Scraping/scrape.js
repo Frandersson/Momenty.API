@@ -2,13 +2,15 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
+
 // Models
 const GenericFund = require('./Models/genericFund');
 
-
+/**
+ * Scrapes 20 funds with the highest return for the past three months.
+ */
 async function getFundReturnRates() {
-
-    const htmlData = await axios.get("https://www.di.se/fonder/historik/?SortBy=Diff3mPrc&SortOrder=desc");
+    const htmlData = await axios.get(process.env.THREE_MONTH_RR_URL);
 
     let fundNames = [];
     let fundReturnRates = [];
