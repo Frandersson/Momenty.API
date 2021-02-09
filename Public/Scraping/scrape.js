@@ -7,7 +7,7 @@ const fs = require('fs');
 const GenericFund = require('./Models/genericFund');
 
 /**
- * Scrapes 20 funds with the highest return for the past three months.
+ * Scrapes and returns 20 funds with the highest return for the past three months.
  */
 async function getFundReturnRates() {
     const htmlData = await axios.get(process.env.THREE_MONTH_RR_URL);
