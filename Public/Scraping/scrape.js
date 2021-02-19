@@ -4,38 +4,67 @@ const cheerio = require('cheerio');
 const fs = require('fs');
 
 // Models
-const GenericFund = require('./Models/genericFund');
+const GenericFundObject = require('./Models/genericFund');
 
-/**
- * Scrapes and returns 20 funds with the highest return for the past three months.
- */
+
 async function getFundReturnRates() {
-    const htmlData = await axios.get(process.env.THREE_MONTH_RR_URL);
-
     let fundNames = [];
-    let fundReturnRates = [];
-    let fundMap = [];
-    
-    const $ = cheerio.load(htmlData.data);
-    
-    $('table.fixed-table tbody').first().find('a').each(function() {
-        fundNames.push($(this).text().trim());
-    })
+    let oneWeekReturnRates = [];
+    let oneMonthReturnRates = [];
+    let threeMonthReturnRates = [];
+    let oneYearReturnRates = [];
 
-    $('table.scrolling-table tbody').first().find('tr').each(function() {
-        $(this).find('td').each(function(i, v) {
-            if (i == 3) {
-                fundReturnRates.push($(this).text().trim())
-            }
+    let finalFundArray = [];
+
+    const htmlResponse = await axios.get(process.env.RR_URL);
+    //var htmlResponse = fs.readFileSync('./output/funds', 'utf-8');
+
+    const $ = cheerio.load(htmlResponse.data);
+
+    $('table').each((index, tableElement) => {
+
+        $(tableElement).find('a').each((index, fundLink) => {
+            fundNames.push($(fundLink).text().trim());
+        })
+
+        $(tableElement).find('tbody > tr').each((index, rowElement) => {
+            $(rowElement).find('td').each((index, rate) => {
+
+                if(index == 1) return;
+
+                parsedRate = parseFloat($(rate).text().trim().replace(",", "."));
+
+                switch(index) {
+                    case 2:
+                        oneWeekReturnRates.push(parsedRate);
+                        break;
+                    case 3:
+                        oneMonthReturnRates.push(parsedRate);
+                        break;
+                    case 4:
+                        threeMonthReturnRates.push(parsedRate);
+                        break;
+                    case 6:
+                        oneYearReturnRates.push(parsedRate);
+                        break;
+                    default:
+                        break;
+                }
+            })
         })
     })
-    
+
     fundNames.forEach(function(value, index) {
-        let returnRate = parseFloat(fundReturnRates[index].replace(",", "."));
-        fundMap.push(new GenericFund(value, returnRate));
+        finalFundArray.push(new GenericFundObject(
+            value,
+            oneWeekReturnRates[index],
+            oneMonthReturnRates[index],
+            threeMonthReturnRates[index],
+            oneYearReturnRates[index]
+        ));
     })
 
-    return fundMap;
+    return finalFundArray;
 }
 
 exports.getFundReturnRates = getFundReturnRates;
